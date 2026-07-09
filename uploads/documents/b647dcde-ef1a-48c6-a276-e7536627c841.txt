@@ -1,0 +1,33 @@
+**NON-DISCLOSURE AGREEMENT**
+
+This Non-Disclosure Agreement ("Agreement") is made and entered into on [DATE] ("Effective Date") by and between:
+
+**ACME CORP** (hereinafter referred to as "Disclosing Party" or "Party A")
+
+**JOHN DOE** (hereinafter referred to as "Receiving Party" or "Party B")
+
+**RECITALS**
+
+WHEREAS, the Disclosing Party has disclosed or may disclose certain confidential and proprietary information to the Receiving Party; and
+
+WHEREAS, the parties wish to establish the terms and conditions under which the Receiving Party may access and utilize such confidential information.
+
+**ARTICLE 1: DEFINITIONS**
+
+1.1 "Confidential Information" means all information, whether written or oral, disclosed by the Disclosing Party to the Receiving Party, including but not limited to trade secrets, business plans, financial information, and any other proprietary information.
+
+1.2 "Confidentiality Period" means a period of two (2) years from the Effective Date.
+
+**ARTICLE 2: OBLIGATIONS OF THE RECEIVING PARTY**
+
+2.1 The Receiving Party shall keep the Confidential Information confidential and shall not disclose it to any third party without the prior written consent of the Disclosing Party.
+
+2.2 The Receiving Party shall not use the Confidential Information for any purpose other than as permitted under this Agreement.
+
+2.3 The Receiving Party shall return all Confidential Information to the Disclosing Party upon request.
+
+**ARTICLE 3: TERM AND TERMINATION**
+
+3.1 The term of this Agreement shall commence on the Effective Date and shall continue for a period of two (2) years.
+
+3

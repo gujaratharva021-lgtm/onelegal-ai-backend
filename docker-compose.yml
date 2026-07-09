@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: legaltech_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      # Must match the database that actually exists in the legaltech_pgdata
+      # volume below. POSTGRES_DB only affects first-time initialization of
+      # an EMPTY data directory — this volume was already initialized (5
+      # days ago) with "legaltech" before this value was ever set to
+      # "legaltech_db", so changing this string alone does NOT rename/create
+      # anything in the existing volume. If you ever wipe the volume and
+      # want a fresh init under a different name, change this AND DB_NAME
+      # below together, then `docker compose down -v` to recreate it.
+      POSTGRES_DB: legaltech
+    ports:
+      - "5433:5432"
+    volumes:
+      - legaltech_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: legaltech_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password123
+      # Must match postgres.environment.POSTGRES_DB above — the database
+      # that actually exists in the running container (see comment there).
+      DB_NAME: legaltech
+      DB_SSLMODE: disable
+      JWT_SECRET: change-me-to-a-long-random-string-in-production
+      JWT_EXPIRY_HOURS: 1
+      JWT_REFRESH_EXPIRY_DAYS: 30
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-no-reply@legaltech.ai}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-sonnet-5}
+    ports:
+      - "8081:8080"
+
+volumes:
+  legaltech_pgdata:

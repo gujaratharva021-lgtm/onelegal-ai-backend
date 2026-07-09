@@ -1,0 +1,34 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+build/
+
+# Android
+android/.gradle/
+
+# iOS
+ios/Pods/
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# Generated
+*.g.dart
+*.freezed.dart
+
+# Coverage
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
