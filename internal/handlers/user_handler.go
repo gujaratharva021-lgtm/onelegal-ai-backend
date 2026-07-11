@@ -83,7 +83,9 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	user.Bio = req.Bio
 	user.LawFirm = req.LawFirm
 	user.BarNumber = req.BarNumber
-	user.GSTNumber = req.GSTNumber
+	if req.GSTNumber != nil {
+		user.GSTNumber = *req.GSTNumber
+	}
 	if req.AccountHolderName != nil {
 		user.AccountHolderName = *req.AccountHolderName
 	}

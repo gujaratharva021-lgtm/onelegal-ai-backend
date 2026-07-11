@@ -120,5 +120,12 @@ func (r *CaseRepository) Update(c *models.Case) error {
 }
 
 func (r *CaseRepository) Delete(id, userID uuid.UUID) error {
-	return database.DB.Where("id = ? AND user_id = ?", id, userID).Delete(&models.Case{}).Error
+	result := database.DB.Where("id = ? AND user_id = ?", id, userID).Delete(&models.Case{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }

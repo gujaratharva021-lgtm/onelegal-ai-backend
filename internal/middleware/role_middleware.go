@@ -14,7 +14,8 @@ import (
 func RequireRole(role string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		val, exists := c.Get("role")
-		if !exists || val.(string) != role {
+		roleStr, isString := val.(string)
+		if !exists || !isString || roleStr != role {
 			response.Error(c, http.StatusForbidden, "Forbidden")
 			c.Abort()
 			return

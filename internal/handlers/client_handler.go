@@ -29,7 +29,11 @@ func NewClientHandler() *ClientHandler {
 }
 
 func (h *ClientHandler) Create(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.ClientRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -54,7 +58,11 @@ func (h *ClientHandler) Create(c *gin.Context) {
 }
 
 func (h *ClientHandler) List(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	clients, err := h.service.List(userID, c.Query("search"))
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to fetch clients")
@@ -64,7 +72,11 @@ func (h *ClientHandler) List(c *gin.Context) {
 }
 
 func (h *ClientHandler) Get(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid client id")
@@ -79,7 +91,11 @@ func (h *ClientHandler) Get(c *gin.Context) {
 }
 
 func (h *ClientHandler) Update(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid client id")
@@ -103,7 +119,11 @@ func (h *ClientHandler) Update(c *gin.Context) {
 }
 
 func (h *ClientHandler) Archive(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid client id")
@@ -120,7 +140,11 @@ func (h *ClientHandler) Archive(c *gin.Context) {
 // ListDocuments returns every document attached to this client, either
 // directly or via one of their cases — the client profile's Documents tab.
 func (h *ClientHandler) ListDocuments(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid client id")
@@ -141,7 +165,11 @@ func (h *ClientHandler) ListDocuments(c *gin.Context) {
 // ListMeetings returns every meeting scheduled with this client — the
 // client profile's Meetings tab.
 func (h *ClientHandler) ListMeetings(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid client id")
@@ -162,7 +190,11 @@ func (h *ClientHandler) ListMeetings(c *gin.Context) {
 // ListInvoices returns every invoice issued to this client — the client
 // profile's Billing tab.
 func (h *ClientHandler) ListInvoices(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid client id")
@@ -184,7 +216,11 @@ func (h *ClientHandler) ListInvoices(c *gin.Context) {
 // Profile screen. The client's Login ID is unchanged; only the password
 // rotates, and the client is notified.
 func (h *ClientHandler) ResetPassword(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid client id")
@@ -208,7 +244,11 @@ func (h *ClientHandler) ResetPassword(c *gin.Context) {
 }
 
 func (h *ClientHandler) Delete(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid client id")

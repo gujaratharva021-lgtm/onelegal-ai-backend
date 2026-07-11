@@ -20,7 +20,11 @@ func NewNotificationHandler() *NotificationHandler {
 }
 
 func (h *NotificationHandler) List(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	unreadOnly := c.Query("unread") == "true"
 	notifications, err := h.service.List(userID, unreadOnly)
 	if err != nil {
@@ -35,7 +39,11 @@ func (h *NotificationHandler) List(c *gin.Context) {
 }
 
 func (h *NotificationHandler) MarkRead(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid notification id")
@@ -49,7 +57,11 @@ func (h *NotificationHandler) MarkRead(c *gin.Context) {
 }
 
 func (h *NotificationHandler) MarkAllRead(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	if err := h.service.MarkAllRead(userID); err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to update notifications")
 		return
@@ -58,7 +70,11 @@ func (h *NotificationHandler) MarkAllRead(c *gin.Context) {
 }
 
 func (h *NotificationHandler) Create(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.NotificationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -73,7 +89,11 @@ func (h *NotificationHandler) Create(c *gin.Context) {
 }
 
 func (h *NotificationHandler) Update(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid notification id")
@@ -93,7 +113,11 @@ func (h *NotificationHandler) Update(c *gin.Context) {
 }
 
 func (h *NotificationHandler) Delete(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid notification id")

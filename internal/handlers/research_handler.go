@@ -20,7 +20,11 @@ func NewResearchHandler(service *services.ResearchService) *ResearchHandler {
 }
 
 func (h *ResearchHandler) Search(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.ResearchRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -35,7 +39,11 @@ func (h *ResearchHandler) Search(c *gin.Context) {
 }
 
 func (h *ResearchHandler) List(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	history, err := h.service.List(userID, c.Query("bookmarked") == "true")
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to fetch research history")
@@ -45,7 +53,11 @@ func (h *ResearchHandler) List(c *gin.Context) {
 }
 
 func (h *ResearchHandler) SetBookmark(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid research id")
@@ -64,7 +76,11 @@ func (h *ResearchHandler) SetBookmark(c *gin.Context) {
 }
 
 func (h *ResearchHandler) Delete(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid research id")

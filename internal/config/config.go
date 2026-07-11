@@ -33,6 +33,12 @@ type Config struct {
 	// are silently disabled (no-op) until this is configured; nothing else
 	// in the app depends on it.
 	FirebaseCredentialsFile string
+	// CORSAllowedOrigins is a comma-separated list of extra allowed origins
+	// (e.g. "https://api.yourdomain.com,https://app.yourdomain.com") for
+	// production. Empty by default — dev already works via the built-in
+	// localhost/LAN/ngrok allowance in middleware.CORSMiddleware without
+	// needing this set.
+	CORSAllowedOrigins string
 }
 
 func Load() *Config {
@@ -67,6 +73,7 @@ func Load() *Config {
 		TurnUsername:            getEnv("TURN_USERNAME", ""),
 		TurnCredential:          getEnv("TURN_CREDENTIAL", ""),
 		FirebaseCredentialsFile: getEnv("FIREBASE_CREDENTIALS_FILE", ""),
+		CORSAllowedOrigins:      getEnv("CORS_ALLOWED_ORIGINS", ""),
 	}
 }
 

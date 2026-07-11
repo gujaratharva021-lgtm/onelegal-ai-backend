@@ -323,6 +323,29 @@ func (s *InvoiceService) MarkPaid(id, lawyerID uuid.UUID) (*models.Invoice, erro
 	if err := s.repo.Update(inv); err != nil {
 		return nil, err
 	}
+
+	// Keep the invoice's linked Payment row (audit trail) in sync — mirrors
+	// the "paid" branch of SetPaymentStatus below, so this shortcut doesn't
+	// leave the audit trail out of sync with the invoice's own status.
+	payment, _ := s.paymentRepo.FindByInvoiceID(inv.ID)
+	if payment == nil {
+		payment = &models.Payment{
+			InvoiceID:   inv.ID,
+			LawyerID:    inv.LawyerID,
+			ClientID:    inv.ClientID,
+			AmountPaise: inv.AmountPaise,
+			AttemptedAt: now,
+		}
+	}
+	payment.Status = models.PaymentStatusPaid
+	payment.VerifiedBy = &lawyerID
+	payment.PaymentDate = &now
+	if payment.ID == uuid.Nil {
+		_ = s.paymentRepo.Create(payment)
+	} else {
+		_ = s.paymentRepo.Update(payment)
+	}
+
 	s.enrichInvoice(inv)
 	return inv, nil
 }

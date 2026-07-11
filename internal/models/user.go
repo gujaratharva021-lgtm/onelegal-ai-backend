@@ -99,12 +99,12 @@ type UpdateProfileRequest struct {
 	Bio       string `json:"bio"`
 	LawFirm   string `json:"law_firm"`
 	BarNumber string `json:"bar_number"`
-	GSTNumber string `json:"gst_number"`
-	// Payment Details — pointers so a caller that omits them (e.g. the
-	// plain Edit Profile screen, which only sends name/phone/bio/etc.)
-	// leaves the lawyer's existing payment settings untouched instead of
-	// wiping them with empty strings. Only the dedicated Payment Details
-	// screen sends these.
+	// GSTNumber and Payment Details — pointers so a caller that omits them
+	// (e.g. the plain Edit Profile screen, which only sends
+	// name/phone/bio/etc., or the Payment Details screen, which never sends
+	// GSTNumber) leaves the lawyer's existing values untouched instead of
+	// wiping them with empty strings.
+	GSTNumber         *string `json:"gst_number"`
 	AccountHolderName *string `json:"account_holder_name"`
 	BankName          *string `json:"bank_name"`
 	AccountNumber     *string `json:"account_number"`

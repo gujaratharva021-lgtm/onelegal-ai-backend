@@ -57,8 +57,8 @@ func (s *AIService) Chat(userID uuid.UUID, req models.AIChatRequest) (*models.AI
 		}
 	} else {
 		title := req.Message
-		if len(title) > 60 {
-			title = title[:60]
+		if runes := []rune(title); len(runes) > 60 {
+			title = string(runes[:60])
 		}
 		conversation = &models.AIConversation{UserID: userID, Title: title}
 		if err := s.repo.CreateConversation(conversation); err != nil {

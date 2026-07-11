@@ -24,7 +24,11 @@ func NewAIDraftingHandler(aiService *services.AIService, docService *services.Do
 }
 
 func (h *AIDraftingHandler) Petition(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.PetitionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -51,7 +55,11 @@ func (h *AIDraftingHandler) Petition(c *gin.Context) {
 }
 
 func (h *AIDraftingHandler) Agreement(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.AgreementRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -78,7 +86,11 @@ func (h *AIDraftingHandler) Agreement(c *gin.Context) {
 }
 
 func (h *AIDraftingHandler) LegalNotice(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.LegalNoticeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())

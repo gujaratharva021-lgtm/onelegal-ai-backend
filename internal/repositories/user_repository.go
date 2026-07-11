@@ -17,6 +17,13 @@ func (r *UserRepository) Create(user *models.User) error {
 	return database.DB.Create(user).Error
 }
 
+// Delete removes a User row — used to roll back a just-created account when
+// a later step in the same signup flow fails, so its email/login ID isn't
+// left permanently reserved by a half-created record.
+func (r *UserRepository) Delete(id uuid.UUID) error {
+	return database.DB.Delete(&models.User{}, "id = ?", id).Error
+}
+
 func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 	var user models.User
 	if err := database.DB.Where("email = ?", email).First(&user).Error; err != nil {

@@ -20,7 +20,11 @@ func NewDraftHandler(service *services.DraftService) *DraftHandler {
 }
 
 func (h *DraftHandler) Create(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.DraftRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -35,7 +39,11 @@ func (h *DraftHandler) Create(c *gin.Context) {
 }
 
 func (h *DraftHandler) GenerateWithAI(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.AIDraftGenerateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -50,7 +58,11 @@ func (h *DraftHandler) GenerateWithAI(c *gin.Context) {
 }
 
 func (h *DraftHandler) List(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	drafts, err := h.service.List(userID, c.Query("type"))
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to fetch drafts")
@@ -60,7 +72,11 @@ func (h *DraftHandler) List(c *gin.Context) {
 }
 
 func (h *DraftHandler) Get(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid draft id")
@@ -75,7 +91,11 @@ func (h *DraftHandler) Get(c *gin.Context) {
 }
 
 func (h *DraftHandler) Update(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid draft id")
@@ -95,7 +115,11 @@ func (h *DraftHandler) Update(c *gin.Context) {
 }
 
 func (h *DraftHandler) Delete(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid draft id")

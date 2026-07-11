@@ -76,11 +76,12 @@ func (h *SignalingHandler) HandleWS(c *gin.Context) {
 		// reject relaying it unless both sender and recipient are the
 		// room's exact two registered participants (lawyer + client). This
 		// is what actually prevents a third authenticated user from ever
-		// joining or interfering with someone else's call.
-		if callID, _ := msg["call_id"].(string); callID != "" {
-			if !h.rooms.Allowed(callID, userID, toID) {
-				continue
-			}
+		// joining or interfering with someone else's call. A missing/empty
+		// call_id must also be rejected, not skip the check — otherwise any
+		// authenticated user could relay to any other by simply omitting it.
+		callID, _ := msg["call_id"].(string)
+		if callID == "" || !h.rooms.Allowed(callID, userID, toID) {
+			continue
 		}
 
 		// Always stamp the authenticated sender, never trust the client's

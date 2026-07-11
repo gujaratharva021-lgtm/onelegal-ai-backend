@@ -69,8 +69,12 @@ func (r *AdminRepository) ListLawyers() ([]models.AdminLawyerSummary, error) {
 	summaries := make([]models.AdminLawyerSummary, 0, len(lawyers))
 	for _, l := range lawyers {
 		var clientCount, caseCount int64
-		database.DB.Model(&models.Client{}).Where("user_id = ?", l.ID).Count(&clientCount)
-		database.DB.Model(&models.Case{}).Where("user_id = ?", l.ID).Count(&caseCount)
+		if err := database.DB.Model(&models.Client{}).Where("user_id = ?", l.ID).Count(&clientCount).Error; err != nil {
+			return nil, err
+		}
+		if err := database.DB.Model(&models.Case{}).Where("user_id = ?", l.ID).Count(&caseCount).Error; err != nil {
+			return nil, err
+		}
 		summaries = append(summaries, models.AdminLawyerSummary{
 			ID:          l.ID.String(),
 			Name:        l.Name,

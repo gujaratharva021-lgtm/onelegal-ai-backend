@@ -17,7 +17,7 @@ func main() {
 	database.Connect(cfg)
 
 	router := gin.Default()
-	router.Use(middleware.CORSMiddleware())
+	router.Use(middleware.CORSMiddleware(cfg.CORSAllowedOrigins))
 
 	routes.Setup(router, cfg)
 

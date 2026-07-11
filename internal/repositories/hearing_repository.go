@@ -50,8 +50,10 @@ func (r *HearingRepository) ListToday(userID uuid.UUID) ([]models.Hearing, error
 	now := time.Now()
 	start := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	end := start.Add(24 * time.Hour)
-	if err := database.DB.Where("user_id = ? AND hearing_date >= ? AND hearing_date < ?", userID, start, end).
-		Order("hearing_date ASC").Find(&hearings).Error; err != nil {
+	if err := database.DB.Where(
+		"user_id = ? AND hearing_date >= ? AND hearing_date < ? AND status NOT IN (?)",
+		userID, start, end, []models.HearingStatus{models.HearingStatusCompleted, models.HearingStatusCancelled},
+	).Order("hearing_date ASC").Find(&hearings).Error; err != nil {
 		return nil, err
 	}
 	return hearings, nil

@@ -21,6 +21,7 @@ ios/Pods/
 
 # Environment
 .env
+firebase-service-account.json
 
 # Generated
 *.g.dart

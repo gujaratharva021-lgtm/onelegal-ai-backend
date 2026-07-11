@@ -20,7 +20,11 @@ func NewMeetingHandler() *MeetingHandler {
 }
 
 func (h *MeetingHandler) Create(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.MeetingRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -35,7 +39,11 @@ func (h *MeetingHandler) Create(c *gin.Context) {
 }
 
 func (h *MeetingHandler) ListUpcoming(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	meetings, err := h.service.ListUpcoming(userID)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to fetch meetings")
@@ -45,7 +53,11 @@ func (h *MeetingHandler) ListUpcoming(c *gin.Context) {
 }
 
 func (h *MeetingHandler) ListHistory(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	meetings, err := h.service.ListHistory(userID)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to fetch meeting history")
@@ -55,7 +67,11 @@ func (h *MeetingHandler) ListHistory(c *gin.Context) {
 }
 
 func (h *MeetingHandler) Get(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid meeting id")
@@ -70,7 +86,11 @@ func (h *MeetingHandler) Get(c *gin.Context) {
 }
 
 func (h *MeetingHandler) Update(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid meeting id")
@@ -90,7 +110,11 @@ func (h *MeetingHandler) Update(c *gin.Context) {
 }
 
 func (h *MeetingHandler) Join(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid meeting id")
@@ -105,7 +129,11 @@ func (h *MeetingHandler) Join(c *gin.Context) {
 }
 
 func (h *MeetingHandler) End(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid meeting id")
@@ -122,7 +150,11 @@ func (h *MeetingHandler) End(c *gin.Context) {
 // Cancel is a distinct, non-destructive alternative to Delete — the meeting
 // stays visible in history with Status = Cancelled instead of being removed.
 func (h *MeetingHandler) Cancel(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid meeting id")
@@ -137,7 +169,11 @@ func (h *MeetingHandler) Cancel(c *gin.Context) {
 }
 
 func (h *MeetingHandler) Delete(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid meeting id")

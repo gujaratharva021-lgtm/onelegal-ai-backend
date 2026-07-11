@@ -1,10 +1,13 @@
 package repositories
 
 import (
+	"errors"
+
 	"legaltech-backend/internal/database"
 	"legaltech-backend/internal/models"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type ClientRepository struct{}
@@ -55,7 +58,10 @@ func (r *ClientRepository) FindDuplicate(userID uuid.UUID, email, phone string, 
 	var c models.Client
 	err := q.First(&c).Error
 	if err != nil {
-		return nil, nil
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
 	}
 	return &c, nil
 }

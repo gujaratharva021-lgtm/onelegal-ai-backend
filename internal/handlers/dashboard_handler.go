@@ -18,7 +18,11 @@ func NewDashboardHandler() *DashboardHandler {
 }
 
 func (h *DashboardHandler) Get(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	dashboard, err := h.service.Get(userID)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to load dashboard")

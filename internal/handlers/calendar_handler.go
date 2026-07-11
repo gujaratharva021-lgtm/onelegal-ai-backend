@@ -21,7 +21,11 @@ func NewCalendarHandler() *CalendarHandler {
 }
 
 func (h *CalendarHandler) Create(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.CalendarEventRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -36,7 +40,11 @@ func (h *CalendarHandler) Create(c *gin.Context) {
 }
 
 func (h *CalendarHandler) List(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 
 	from := time.Now().AddDate(0, -1, 0)
 	to := time.Now().AddDate(0, 2, 0)
@@ -61,7 +69,11 @@ func (h *CalendarHandler) List(c *gin.Context) {
 }
 
 func (h *CalendarHandler) Get(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid event id")
@@ -76,7 +88,11 @@ func (h *CalendarHandler) Get(c *gin.Context) {
 }
 
 func (h *CalendarHandler) Update(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid event id")
@@ -96,7 +112,11 @@ func (h *CalendarHandler) Update(c *gin.Context) {
 }
 
 func (h *CalendarHandler) Delete(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid event id")

@@ -50,6 +50,14 @@ func (r *AIRepository) ListMessages(conversationID uuid.UUID) ([]models.AIMessag
 }
 
 func (r *AIRepository) DeleteConversation(id, userID uuid.UUID) error {
+	// Verify ownership first — deleting messages by conversation_id alone,
+	// before confirming this conversation belongs to userID, would let a
+	// user wipe another user's conversation's messages just by guessing an
+	// id, even though the conversation row itself is correctly scoped below.
+	var conv models.AIConversation
+	if err := database.DB.Where("id = ? AND user_id = ?", id, userID).First(&conv).Error; err != nil {
+		return err
+	}
 	if err := database.DB.Where("conversation_id = ?", id).Delete(&models.AIMessage{}).Error; err != nil {
 		return err
 	}

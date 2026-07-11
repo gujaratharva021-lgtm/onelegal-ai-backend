@@ -19,7 +19,11 @@ func NewAIRecommendationHandler(service *services.AIRecommendationService) *AIRe
 }
 
 func (h *AIRecommendationHandler) Generate(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	caseID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid case id")
@@ -34,7 +38,11 @@ func (h *AIRecommendationHandler) Generate(c *gin.Context) {
 }
 
 func (h *AIRecommendationHandler) List(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	caseID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid case id")

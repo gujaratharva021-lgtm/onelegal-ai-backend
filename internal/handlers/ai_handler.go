@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
+	"strings"
 
 	"legaltech-backend/internal/models"
 	"legaltech-backend/internal/services"
@@ -9,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type AIHandler struct {
@@ -20,7 +23,11 @@ func NewAIHandler(service *services.AIService) *AIHandler {
 }
 
 func (h *AIHandler) Chat(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.AIChatRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -35,7 +42,11 @@ func (h *AIHandler) Chat(c *gin.Context) {
 }
 
 func (h *AIHandler) ListConversations(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	conversations, err := h.service.ListConversations(userID)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to fetch conversations")
@@ -45,7 +56,11 @@ func (h *AIHandler) ListConversations(c *gin.Context) {
 }
 
 func (h *AIHandler) GetMessages(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid conversation id")
@@ -60,13 +75,21 @@ func (h *AIHandler) GetMessages(c *gin.Context) {
 }
 
 func (h *AIHandler) DeleteConversation(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid conversation id")
 		return
 	}
 	if err := h.service.DeleteConversation(id, userID); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			response.Error(c, http.StatusNotFound, "Conversation not found")
+			return
+		}
 		response.Error(c, http.StatusInternalServerError, "Failed to delete conversation")
 		return
 	}
@@ -77,6 +100,10 @@ func (h *AIHandler) Summarize(c *gin.Context) {
 	var req models.AISummarizeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if strings.TrimSpace(req.Text) == "" {
+		response.Error(c, http.StatusBadRequest, "Text is required")
 		return
 	}
 	summary, err := h.service.Summarize(req.Text)

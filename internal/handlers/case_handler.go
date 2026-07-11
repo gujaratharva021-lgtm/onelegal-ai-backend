@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -11,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type CaseHandler struct {
@@ -22,7 +24,11 @@ func NewCaseHandler() *CaseHandler {
 }
 
 func (h *CaseHandler) Create(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.CaseRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -37,9 +43,29 @@ func (h *CaseHandler) Create(c *gin.Context) {
 }
 
 func (h *CaseHandler) List(c *gin.Context) {
-	userID, _ := currentUserID(c)
-	page, _ := strconv.Atoi(c.Query("page"))
-	pageSize, _ := strconv.Atoi(c.Query("page_size"))
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
+	page := 0
+	if v := c.Query("page"); v != "" {
+		parsed, err := strconv.Atoi(v)
+		if err != nil {
+			response.Error(c, http.StatusBadRequest, "Invalid page")
+			return
+		}
+		page = parsed
+	}
+	pageSize := 0
+	if v := c.Query("page_size"); v != "" {
+		parsed, err := strconv.Atoi(v)
+		if err != nil {
+			response.Error(c, http.StatusBadRequest, "Invalid page_size")
+			return
+		}
+		pageSize = parsed
+	}
 	result, err := h.service.List(userID, repositories.CaseListFilter{
 		Search:   c.Query("search"),
 		Status:   c.Query("status"),
@@ -59,7 +85,11 @@ func (h *CaseHandler) List(c *gin.Context) {
 }
 
 func (h *CaseHandler) Get(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid case id")
@@ -74,7 +104,11 @@ func (h *CaseHandler) Get(c *gin.Context) {
 }
 
 func (h *CaseHandler) Update(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid case id")
@@ -94,13 +128,21 @@ func (h *CaseHandler) Update(c *gin.Context) {
 }
 
 func (h *CaseHandler) Delete(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid case id")
 		return
 	}
 	if err := h.service.Delete(id, userID); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			response.Error(c, http.StatusNotFound, "Case not found")
+			return
+		}
 		response.Error(c, http.StatusInternalServerError, "Failed to delete case")
 		return
 	}

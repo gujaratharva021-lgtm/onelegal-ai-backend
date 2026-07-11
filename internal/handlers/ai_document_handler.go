@@ -18,7 +18,11 @@ func NewAIDocumentHandler(service *services.AIDocumentService) *AIDocumentHandle
 }
 
 func (h *AIDocumentHandler) Summarize(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	file, err := c.FormFile("file")
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "No file provided")
@@ -33,7 +37,11 @@ func (h *AIDocumentHandler) Summarize(c *gin.Context) {
 }
 
 func (h *AIDocumentHandler) AnalyzeContract(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	file, err := c.FormFile("file")
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "No file provided")
@@ -48,7 +56,11 @@ func (h *AIDocumentHandler) AnalyzeContract(c *gin.Context) {
 }
 
 func (h *AIDocumentHandler) History(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	history, err := h.service.History(userID, c.Query("type"))
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to fetch history")

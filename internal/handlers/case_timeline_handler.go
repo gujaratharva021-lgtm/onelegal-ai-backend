@@ -20,7 +20,11 @@ func NewCaseTimelineHandler() *CaseTimelineHandler {
 }
 
 func (h *CaseTimelineHandler) Create(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	caseID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid case id")
@@ -40,7 +44,11 @@ func (h *CaseTimelineHandler) Create(c *gin.Context) {
 }
 
 func (h *CaseTimelineHandler) List(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	caseID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid case id")
@@ -55,7 +63,11 @@ func (h *CaseTimelineHandler) List(c *gin.Context) {
 }
 
 func (h *CaseTimelineHandler) Update(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	eventID, err := uuid.Parse(c.Param("eventId"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid event id")

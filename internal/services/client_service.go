@@ -35,7 +35,10 @@ func NewClientService() *ClientService {
 }
 
 func (s *ClientService) checkDuplicate(userID uuid.UUID, email, phone string, excludeID *uuid.UUID) error {
-	existing, _ := s.repo.FindDuplicate(userID, email, phone, excludeID)
+	existing, err := s.repo.FindDuplicate(userID, email, phone, excludeID)
+	if err != nil {
+		return err
+	}
 	if existing == nil {
 		return nil
 	}
@@ -110,6 +113,9 @@ func (s *ClientService) Create(userID uuid.UUID, req models.ClientRequest) (*mod
 		AccountStatus: models.ClientAccountActive,
 	}
 	if err := s.repo.Create(&client); err != nil {
+		// Roll back the login account created above — otherwise its email/
+		// login ID is left permanently reserved by a Client-less User row.
+		_ = s.userRepo.Delete(accountUser.ID)
 		return nil, err
 	}
 

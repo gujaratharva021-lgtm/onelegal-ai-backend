@@ -20,7 +20,11 @@ func NewDocumentHandler() *DocumentHandler {
 }
 
 func (h *DocumentHandler) Create(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.DocumentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -35,7 +39,11 @@ func (h *DocumentHandler) Create(c *gin.Context) {
 }
 
 func (h *DocumentHandler) List(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	docs, err := h.service.List(userID, c.Query("case_id"))
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to fetch documents")
@@ -45,7 +53,11 @@ func (h *DocumentHandler) List(c *gin.Context) {
 }
 
 func (h *DocumentHandler) Get(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid document id")
@@ -60,7 +72,11 @@ func (h *DocumentHandler) Get(c *gin.Context) {
 }
 
 func (h *DocumentHandler) Upload(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	caseID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid case id")
@@ -81,7 +97,11 @@ func (h *DocumentHandler) Upload(c *gin.Context) {
 }
 
 func (h *DocumentHandler) ListForCase(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	caseID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid case id")
@@ -96,7 +116,11 @@ func (h *DocumentHandler) ListForCase(c *gin.Context) {
 }
 
 func (h *DocumentHandler) Download(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid document id")
@@ -115,7 +139,11 @@ func (h *DocumentHandler) Download(c *gin.Context) {
 }
 
 func (h *DocumentHandler) Sign(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	file, err := c.FormFile("file")
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "No file provided")
@@ -129,7 +157,11 @@ func (h *DocumentHandler) Sign(c *gin.Context) {
 }
 
 func (h *DocumentHandler) GetSignature(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	path, err := h.service.SignaturePath(userID)
 	if err != nil || path == "" {
 		response.Error(c, http.StatusNotFound, "No signature uploaded yet")
@@ -139,7 +171,11 @@ func (h *DocumentHandler) GetSignature(c *gin.Context) {
 }
 
 func (h *DocumentHandler) Delete(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid document id")

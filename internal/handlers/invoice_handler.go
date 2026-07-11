@@ -22,7 +22,11 @@ func NewInvoiceHandler() *InvoiceHandler {
 }
 
 func (h *InvoiceHandler) Create(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.CreateInvoiceRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -37,7 +41,11 @@ func (h *InvoiceHandler) Create(c *gin.Context) {
 }
 
 func (h *InvoiceHandler) List(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	invoices, err := h.service.List(userID)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to fetch invoices")
@@ -47,7 +55,11 @@ func (h *InvoiceHandler) List(c *gin.Context) {
 }
 
 func (h *InvoiceHandler) Get(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid invoice id")
@@ -64,7 +76,11 @@ func (h *InvoiceHandler) Get(c *gin.Context) {
 // Update edits an existing invoice's content — rejected once a payment has
 // been submitted or confirmed (see InvoiceService.Update).
 func (h *InvoiceHandler) Update(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid invoice id")
@@ -84,7 +100,11 @@ func (h *InvoiceHandler) Update(c *gin.Context) {
 }
 
 func (h *InvoiceHandler) Send(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid invoice id")
@@ -102,7 +122,11 @@ func (h *InvoiceHandler) Send(c *gin.Context) {
 // account" action — payment is never auto-marked Paid from the client's UPI
 // Intent result alone.
 func (h *InvoiceHandler) MarkPaid(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid invoice id")
@@ -119,7 +143,11 @@ func (h *InvoiceHandler) MarkPaid(c *gin.Context) {
 // SetPaymentStatus is the Payments module's manual lawyer action —
 // Pending/Paid/Cancelled — separate from editing the invoice's own content.
 func (h *InvoiceHandler) SetPaymentStatus(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid invoice id")
@@ -141,7 +169,11 @@ func (h *InvoiceHandler) SetPaymentStatus(c *gin.Context) {
 // GetPayment returns the invoice's Payment audit record (UTR, verified by,
 // payment date) — lawyer-scoped.
 func (h *InvoiceHandler) GetPayment(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid invoice id")
@@ -157,7 +189,11 @@ func (h *InvoiceHandler) GetPayment(c *gin.Context) {
 
 // PaymentHistory is the lawyer's full Payment History across every invoice.
 func (h *InvoiceHandler) PaymentHistory(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	payments, err := h.service.ListPaymentHistory(userID)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Failed to fetch payment history")
@@ -167,7 +203,11 @@ func (h *InvoiceHandler) PaymentHistory(c *gin.Context) {
 }
 
 func (h *InvoiceHandler) PDF(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid invoice id")
@@ -182,7 +222,11 @@ func (h *InvoiceHandler) PDF(c *gin.Context) {
 }
 
 func (h *InvoiceHandler) Delete(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid invoice id")

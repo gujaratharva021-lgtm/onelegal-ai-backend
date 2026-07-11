@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"legaltech-backend/internal/models"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type VideoRoomHandler struct {
@@ -21,7 +23,11 @@ func NewVideoRoomHandler(service *services.VideoRoomService) *VideoRoomHandler {
 
 // StartCall — lawyer presses "Start Meeting" on a scheduled meeting.
 func (h *VideoRoomHandler) StartCall(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	var req models.StartMeetingCallRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
@@ -41,10 +47,18 @@ func (h *VideoRoomHandler) StartCall(c *gin.Context) {
 
 // ActiveForMe — the client-side check performed on login/app open.
 func (h *VideoRoomHandler) ActiveForMe(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	room, lawyerName, err := h.service.ActiveForClient(userID)
 	if err != nil {
-		response.Success(c, http.StatusOK, "No active meeting", gin.H{"room": nil})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			response.Success(c, http.StatusOK, "No active meeting", gin.H{"room": nil})
+			return
+		}
+		response.Error(c, http.StatusInternalServerError, "Failed to check for an active meeting")
 		return
 	}
 	response.Success(c, http.StatusOK, "Active meeting found", gin.H{
@@ -54,7 +68,11 @@ func (h *VideoRoomHandler) ActiveForMe(c *gin.Context) {
 }
 
 func (h *VideoRoomHandler) Join(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid room id")
@@ -76,7 +94,11 @@ func (h *VideoRoomHandler) Join(c *gin.Context) {
 // distinction is just whether the room was ever accepted (see
 // VideoRoomService.End).
 func (h *VideoRoomHandler) End(c *gin.Context) {
-	userID, _ := currentUserID(c)
+	userID, ok := currentUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Invalid room id")

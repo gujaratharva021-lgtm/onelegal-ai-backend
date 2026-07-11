@@ -64,8 +64,15 @@ func (r *TaskRepository) ListUpcoming(userID uuid.UUID, limit int) ([]models.Tas
 	var tasks []models.Task
 	now := time.Now()
 	startOfToday := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-	if err := database.DB.Where("user_id = ? AND status = ? AND due_date >= ?", userID, models.TaskStatusPending, startOfToday).
-		Order("due_date ASC").Limit(limit).Find(&tasks).Error; err != nil {
+	// due_date is nullable (a task can be created with no due date). A plain
+	// "due_date >= startOfToday" comparison evaluates to NULL/false in SQL for
+	// those rows, silently excluding every no-due-date task from "upcoming" —
+	// even though it's still open and pending. Treat "no due date" as always
+	// upcoming.
+	if err := database.DB.Where(
+		"user_id = ? AND status = ? AND (due_date IS NULL OR due_date >= ?)",
+		userID, models.TaskStatusPending, startOfToday,
+	).Order("due_date ASC NULLS LAST").Limit(limit).Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 	return tasks, nil

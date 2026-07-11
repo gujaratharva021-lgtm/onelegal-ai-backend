@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -79,6 +80,7 @@ func model() string {
 func send(ctx context.Context, payload []byte) (string, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, groqChatCompletionsURL, bytes.NewReader(payload))
 	if err != nil {
+		log.Printf("[ai] request build failed: %v", err)
 		return "", errors.New(genericFailureMessage)
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -86,25 +88,34 @@ func send(ctx context.Context, payload []byte) (string, error) {
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
+		log.Printf("[ai] groq request failed: %v", err)
 		return "", errors.New(genericFailureMessage)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		log.Printf("[ai] failed to read groq response body: %v", err)
 		return "", errors.New(genericFailureMessage)
 	}
 
 	var parsed groqChatResponse
 	if err := json.Unmarshal(body, &parsed); err != nil {
+		log.Printf("[ai] failed to parse groq response (status %d): %v; body=%s", resp.StatusCode, err, body)
 		return "", errors.New(genericFailureMessage)
 	}
 
 	if resp.StatusCode != http.StatusOK || parsed.Error != nil {
+		providerMsg := ""
+		if parsed.Error != nil {
+			providerMsg = parsed.Error.Message
+		}
+		log.Printf("[ai] groq returned an error: status=%d message=%q", resp.StatusCode, providerMsg)
 		return "", errors.New(genericFailureMessage)
 	}
 
 	if len(parsed.Choices) == 0 || parsed.Choices[0].Message.Content == "" {
+		log.Printf("[ai] groq returned no choices/content (status %d): body=%s", resp.StatusCode, body)
 		return "", errors.New(genericFailureMessage)
 	}
 
@@ -117,6 +128,7 @@ func send(ctx context.Context, payload []byte) (string, error) {
 // generic, user-safe error message — never the underlying provider error.
 func GenerateResponse(ctx context.Context, prompt string) (string, error) {
 	if apiKey() == "" {
+		log.Printf("[ai] GROQ_API_KEY is not set in this process's environment")
 		return "", errors.New(genericFailureMessage)
 	}
 
@@ -167,6 +179,7 @@ type visionRequest struct {
 // actual content type, e.g. "image/png" or "image/jpeg".
 func ExtractImageText(ctx context.Context, base64Data, mimeType string) (string, error) {
 	if apiKey() == "" {
+		log.Printf("[ai] GROQ_API_KEY is not set in this process's environment")
 		return "", errors.New(genericFailureMessage)
 	}
 
