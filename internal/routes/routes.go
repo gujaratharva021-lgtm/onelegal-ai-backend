@@ -52,6 +52,20 @@ func Setup(router *gin.Engine, cfg *config.Config) {
 	clientPortalHandler := handlers.NewClientPortalHandler()
 	adminHandler := handlers.NewAdminHandler()
 
+	// Root route — prevents Elastic Beanstalk's domain from 404ing when
+	// opened directly in a browser. This is a pure JSON API (the actual
+	// client is the Flutter app), so "/" simply confirms the service is
+	// live and points callers to the real entry points, rather than
+	// falling through to Gin's default NoRoute 404 handler.
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"service": "legaltech-backend",
+			"status":  "running",
+			"health":  "/health",
+			"api":     "/api/v1",
+		})
+	})
+
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
