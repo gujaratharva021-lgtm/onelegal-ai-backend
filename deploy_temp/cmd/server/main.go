@@ -7,7 +7,8 @@ import (
 	"legaltech-backend/internal/database"
 	"legaltech-backend/internal/middleware"
 	"legaltech-backend/internal/routes"
-    "github.com/gin-gonic/gin"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
