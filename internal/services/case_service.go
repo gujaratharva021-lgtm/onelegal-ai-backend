@@ -76,6 +76,23 @@ func (s *CaseService) Create(userID uuid.UUID, req models.CaseRequest) (*models.
 		Judge:           req.Judge,
 		Opponent:        req.Opponent,
 		CaseType:        req.CaseType,
+CNRNumber:       req.CNRNumber,
+LodgingNumber:   req.LodgingNumber,
+FilingDate:      req.FilingDate,
+RegNumber:       req.RegNumber,
+RegDate:         req.RegDate,
+Petitioner:      req.Petitioner,
+Respondent:      req.Respondent,
+PetnAdvocate:    req.PetnAdvocate,
+RespAdvocate:    req.RespAdvocate,
+District:        req.District,
+Bench:           req.Bench,
+Category:        req.Category,
+Stage:           req.Stage,
+Coram:           req.Coram,
+LastHearingDate: req.LastHearingDate,
+LastCoram:       req.LastCoram,
+Act:             req.Act,
 		Priority:        priority,
 		Status:          status,
 		Description:     req.Description,
@@ -130,6 +147,23 @@ func (s *CaseService) Update(id, userID uuid.UUID, req models.CaseRequest) (*mod
 	c.Judge = req.Judge
 	c.Opponent = req.Opponent
 	c.CaseType = req.CaseType
+c.CNRNumber = req.CNRNumber
+c.LodgingNumber = req.LodgingNumber
+c.FilingDate = req.FilingDate
+c.RegNumber = req.RegNumber
+c.RegDate = req.RegDate
+c.Petitioner = req.Petitioner
+c.Respondent = req.Respondent
+c.PetnAdvocate = req.PetnAdvocate
+c.RespAdvocate = req.RespAdvocate
+c.District = req.District
+c.Bench = req.Bench
+c.Category = req.Category
+c.Stage = req.Stage
+c.Coram = req.Coram
+c.LastHearingDate = req.LastHearingDate
+c.LastCoram = req.LastCoram
+c.Act = req.Act
 	if req.Priority != "" {
 		c.Priority = req.Priority
 	}

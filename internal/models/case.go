@@ -34,6 +34,23 @@ type Case struct {
 	Judge           string         `json:"judge"`
 	Opponent        string         `json:"opponent"`
 	CaseType        string         `json:"case_type"`
+CNRNumber       string         `json:"cnr_number"`
+LodgingNumber   string         `json:"lodging_number"`
+FilingDate      *time.Time     `json:"filing_date"`
+RegNumber       string         `json:"registration_number"`
+RegDate         *time.Time     `json:"registration_date"`
+Petitioner      string         `json:"petitioner"`
+Respondent      string         `json:"respondent"`
+PetnAdvocate    string         `json:"petitioner_advocate"`
+RespAdvocate    string         `json:"respondent_advocate"`
+District        string         `json:"district"`
+Bench           string         `json:"bench"`
+Category        string         `json:"category"`
+Stage           string         `json:"stage"`
+Coram           string         `json:"coram"`
+LastHearingDate *time.Time     `json:"last_hearing_date"`
+LastCoram       string         `json:"last_coram"`
+Act             string         `json:"act"`
 	Priority        CasePriority   `json:"priority" gorm:"default:medium;index"`
 	Status          CaseStatus     `json:"status" gorm:"default:upcoming;index"`
 	Description     string         `json:"description"`
@@ -52,6 +69,23 @@ type CaseRequest struct {
 	Judge           string       `json:"judge"`
 	Opponent        string       `json:"opponent"`
 	CaseType        string       `json:"case_type"`
+CNRNumber       string       `json:"cnr_number"`
+LodgingNumber   string       `json:"lodging_number"`
+FilingDate      *time.Time   `json:"filing_date"`
+RegNumber       string       `json:"registration_number"`
+RegDate         *time.Time   `json:"registration_date"`
+Petitioner      string       `json:"petitioner"`
+Respondent      string       `json:"respondent"`
+PetnAdvocate    string       `json:"petitioner_advocate"`
+RespAdvocate    string       `json:"respondent_advocate"`
+District        string       `json:"district"`
+Bench           string       `json:"bench"`
+Category        string       `json:"category"`
+Stage           string       `json:"stage"`
+Coram           string       `json:"coram"`
+LastHearingDate *time.Time   `json:"last_hearing_date"`
+LastCoram       string       `json:"last_coram"`
+Act             string       `json:"act"`
 	Priority        CasePriority `json:"priority"`
 	Status          CaseStatus   `json:"status"`
 	Description     string       `json:"description"`
