@@ -24,13 +24,13 @@ const genericFailureMessage = "AI service is temporarily unavailable. Please try
 
 // systemPrompt is intentionally short to minimize token usage on every call.
 const systemPrompt = "You are an AI Legal Assistant for Indian lawyers. Give accurate, concise legal information. " +
-	"Keep responses under 250 words unless the user explicitly asks for detailed explanations."
+	"Do not cut answers short; fully cover all relevant points, steps, or clauses the question calls for."
 
 const (
 	defaultModel   = "llama-3.1-8b-instant"
 	visionModel    = "meta-llama/llama-4-scout-17b-16e-instruct"
 	requestTimeout = 20 * time.Second
-	maxTokens      = 350
+	maxTokens      = 2048
 	ocrMaxTokens   = 1024
 	temperature    = 0.2
 )
